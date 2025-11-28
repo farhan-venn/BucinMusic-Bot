@@ -43,13 +43,20 @@ client.player = player;
 // Fungsi Memuat Extractors
 async function loadExtractors() {
     try {
-        // Menggunakan ExtractorFactory yang diimpor langsung
-        await ExtractorFactory.loadPlayerExtractors(player);
+        // PERBAIKAN: Muat Extractor YouTube secara eksplisit
+        const { YouTubeExtractor } = require('@discord-player/extractor');
+
+        // Pastikan Anda memanggil loadPlayerExtractors pada player, 
+        // dan pastikan Anda memasukkan Extractor YouTube
+        await ExtractorFactory.loadPlayerExtractors(player, {
+            extractors: [
+                YouTubeExtractor 
+            ]
+        });
+
         console.log('[Bot] Extractors loaded successfully!');
     } catch (e) {
-        // Logika tambahan untuk debugging:
         console.error('[Bot] Failed to load extractors:', e);
-        console.log('Pastikan @discord-player/extractor sudah terinstal.');
     }
 }
 // ----------------------------------
