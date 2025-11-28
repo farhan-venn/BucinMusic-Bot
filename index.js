@@ -29,12 +29,8 @@ client.commands = new Collection();
 
 // --- 3. DEKLARASI PLAYER ---
 const player = new Player(client, {
-    ytdlOptions: {
-        quality: 'highestaudio',
-        highWaterMark: 1 << 25,
-    },
-    // PERBAIKAN: SETELAH client (atau sebelum ytdlOptions)
-    extractor: playdl.ytdl // <-- TAMBAHKAN INI
+    // Biarkan ini kosong atau hapus opsi ytdlOptions/extractor
+    // Jika Anda ingin tetap ada, pastikan opsi ini diizinkan tanpa ytdl-core/play-dl
 });
 
 // BARIS KRUSIAL: Tempelkan objek player ke client
