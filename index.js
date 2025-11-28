@@ -1,7 +1,6 @@
 const { Client, IntentsBitField, Collection, REST, Routes } = require('discord.js');
 const { Player } = require('discord-player');
-// Pastikan paket extractor di-require dengan benar
-const { ExtractorFactory } = require('@discord-player/extractor');
+// Hapus semua require Extractor di sini!
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
@@ -28,33 +27,14 @@ client.commands = new Collection();
 
 // --- 3. DEKLARASI PLAYER ---
 const player = new Player(client, {
-    // Biarkan ini kosong atau hapus opsi ytdlOptions/extractor
-    // Jika Anda ingin tetap ada, pastikan opsi ini diizinkan tanpa ytdl-core/play-dl
+    // Player akan menggunakan Extractor bawaan secara otomatis di v6.x
 });
 
 // BARIS KRUSIAL: Tempelkan objek player ke client
 client.player = player; 
 // ------------------------------------------
 
-// Fungsi Memuat Extractors
-async function loadExtractors() {
-    try {
-        // PERBAIKAN: Muat Extractor YouTube secara eksplisit
-        const { YouTubeExtractor } = require('@discord-player/extractor');
-
-        // Pastikan Anda memanggil loadPlayerExtractors pada player, 
-        // dan pastikan Anda memasukkan Extractor YouTube
-        await ExtractorFactory.loadPlayerExtractors(player, {
-            extractors: [
-                YouTubeExtractor 
-            ]
-        });
-
-        console.log('[Bot] Extractors loaded successfully!');
-    } catch (e) {
-        console.error('[Bot] Failed to load extractors:', e);
-    }
-}
+// HAPUS FUNGSI loadExtractors() KARENA SUDAH TIDAK PERLU DIPANGGIL SECARA MANUAL
 // ----------------------------------
 
 
@@ -99,7 +79,7 @@ try {
 // --- 5. EVENT HANDLERS ---
 client.on('ready', async () => {
     console.log(`BucinMusic#${client.user ? client.user.username : 'Bot'} online!`);
-    await loadExtractors(); // Muat extractor setelah bot online
+    // HAPUS PANGGILAN INI: await loadExtractors(); 
 
     // Mendaftarkan Slash Commands ke Discord API
     const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
@@ -130,10 +110,9 @@ client.on('interactionCreate', async (interaction) => {
     }
 
     try {
-        // KEMBALIKAN player ke dalam destructuring ARGUMEN, 
-        // meskipun kita tahu client.player sudah ditempelkan.
-        // Ini memastikan tidak ada error variabel yang hilang.
-        await command.execute({ interaction, client, player });
+        // Panggil hanya { interaction, client }
+        // play.js akan mendapatkan player melalui client.player
+        await command.execute({ interaction, client }); 
     } catch (error) {
         console.error(error);
         if (interaction.replied || interaction.deferred) {
