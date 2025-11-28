@@ -1,7 +1,8 @@
-// index.js (Pastikan kode Anda sudah dimodifikasi seperti ini)
 import { Client, IntentsBitField } from 'discord.js';
 import 'dotenv/config';
-import { Player, ExtractorFactory } from 'discord-player'; // Tambahkan ExtractorFactory
+import { Player } from 'discord-player'; // Import Player dari discord-player
+// Karena kita menambahkan "type": "module", kita bisa import ExtractorFactory
+import { ExtractorFactory } from '@discord-player/extractor'; 
 
 const client = new Client({
     intents: [
@@ -25,8 +26,9 @@ const player = new Player(client, {
     },
 });
 
-// WAJIB DITAMBAHKAN/VERIFIKASI: Memuat semua extractor yang terinstal
-player.extractors.loadDefault();
+// WAJIB: Memuat Extractor Factory untuk mengatasi "No current track"
+// Ini adalah cara yang benar untuk memuat extractor di lingkungan ES Module.
+ExtractorFactory.load(player);
 console.log('[Bot] Player initialized with extractors');
 
 // Tangani event error (disarankan)
@@ -34,12 +36,11 @@ player.on('error', (queue, error) => {
     console.log(`[Player Error] ${error.message}`);
 });
 
-// Tangani event track error (disarankan)
 player.events.on('playerError', (queue, error) => {
     console.log(`[Player Track Error] ${error.message}`);
 });
 
-// Import commands (asumsi file ini mengimpor semua commands)
-import('./commands.js'); // Ganti dengan cara Anda memuat commands
+// Import commands (sesuaikan dengan cara Anda memuat commands)
+import('./commands.js'); 
 
 client.login(process.env.TOKEN);
