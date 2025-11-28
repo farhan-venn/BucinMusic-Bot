@@ -1,22 +1,20 @@
 {
   "name": "bucinmusic-bot",
   "version": "1.0.0",
-  "description": "Bot Musik untuk Bucin",
+  "description": "Discord Music Bot",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
-  "keywords": [
-    "discord-bot",
-    "music-bot"
-  ],
-  "author": "Farhan Venn",
-  "license": "ISC",
   "dependencies": {
-    "@discordjs/voice": "^0.16.1",
-    "discord-player": "6.6.6",         
     "discord.js": "^14.14.1",
-    "dotenv": "^16.3.1",
-    "ffmpeg-static": "^5.2.0"
+    "discord-player": "^6.6.9",
+    "@discordjs/voice": "^0.16.1",
+    "dotenv": "^16.4.5",
+    "play-dl": "^1.9.7"
+    
+  },
+  "engines": {
+    "node": ">=20.0.0" 
   }
 }
