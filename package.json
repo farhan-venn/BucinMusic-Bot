@@ -12,9 +12,9 @@
   ],
   "author": "Farhan Venn",
   "license": "ISC",
-  "dependencies": {
+"dependencies": {
     "@discord-player/extractor": "^4.4.7",
-    "@discordjs/voice": "^0.16.1", <--- BARIS INI
+    "@discordjs/voice": "^0.16.1",   <-- Pastikan ada koma (,) di akhir baris ini!
     "discord-player": "^6.6.6",
     "discord.js": "^14.14.1",
     "dotenv": "^16.3.1",
