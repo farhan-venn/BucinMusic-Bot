@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Bot Musik untuk Bucin",
   "main": "index.js",
-  "type": "module",  <--- BARIS INI WAJIB ADA!
+  "type": "module", 
   "scripts": {
     "start": "node index.js"
   },
