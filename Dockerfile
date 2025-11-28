@@ -1,22 +1,21 @@
-# Gunakan image Node.js LTS 18 yang stabil
+# Menggunakan Alpine (lebih ringan dan hanya punya sh)
 FROM node:18-alpine 
 
-# Set direktori kerja di dalam container
+# Instal dependensi yang diperlukan play-dl
+RUN apk add --no-cache ffmpeg
+
+# Set direktori kerja
 WORKDIR /usr/src/app
 
-# Salin package.json dan package-lock.json (jika ada) ke dalam container
+# Salin package.json dan instal dependensi
 COPY package*.json ./
-
-# Instal semua dependensi
-# --force diperlukan untuk mengatasi beberapa isu dependency graph lama
 RUN npm install --omit=dev --force
 
 # Salin sisa kode aplikasi
 COPY . .
 
-# Beri hak akses eksekusi ke start.sh (jika Anda membuatnya di langkah sebelumnya)
-# Jika tidak, hapus baris ini, tapi jika Anda membuat start.sh, biarkan
+# Beri hak akses eksekusi ke start.sh
 RUN chmod +x start.sh 
 
-# Tentukan command untuk menjalankan bot (sesuai skrip start di package.json)
-CMD ["npm", "start"]
+# Jalankan bot
+CMD ["/bin/sh", "start.sh"]
