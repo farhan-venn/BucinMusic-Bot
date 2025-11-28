@@ -1,5 +1,6 @@
 const { Client, IntentsBitField, Collection, REST, Routes } = require('discord.js');
 const { Player } = require('discord-player');
+// Pastikan paket extractor di-require dengan benar
 const ExtractorPackage = require('@discord-player/extractor'); 
 const ExtractorFactory = ExtractorPackage.ExtractorFactory || ExtractorPackage.default.ExtractorFactory;
 const fs = require('fs');
@@ -24,9 +25,9 @@ const client = new Client({
         IntentsBitField.Flags.MessageContent,
     ],
 });
-client.commands = new Collection(); // Inisialisasi Collection di sini.
+client.commands = new Collection(); 
 
-// --- 3. DEKLARASI PLAYER (HANYA SATU KALI) ---
+// --- 3. DEKLARASI PLAYER ---
 const player = new Player(client, {
     ytdlOptions: {
         quality: 'highestaudio',
@@ -36,7 +37,7 @@ const player = new Player(client, {
     },
 });
 
-// BARIS PENTING: Tempelkan objek player ke client SETELAH KEDUANYA dideklarasikan
+// BARIS KRUSIAL: Tempelkan objek player ke client
 client.player = player; 
 // ------------------------------------------
 
@@ -124,7 +125,7 @@ client.on('interactionCreate', async (interaction) => {
     }
 
     try {
-        // Karena player ditempelkan ke client, panggil hanya { interaction, client }
+        // Panggil hanya { interaction, client }
         await command.execute({ interaction, client });
     } catch (error) {
         console.error(error);
