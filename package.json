@@ -12,7 +12,7 @@
   ],
   "author": "Farhan Venn",
   "license": "ISC",
-"dependencies": {
+  "dependencies": {
     "@discord-player/extractor": "^4.4.7",
     "@discord-player/youtube": "^1.x", 
     "@discordjs/voice": "^0.16.1",
