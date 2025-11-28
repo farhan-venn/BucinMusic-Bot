@@ -14,7 +14,7 @@
   "license": "ISC",
 "dependencies": {
     "@discord-player/extractor": "^4.4.7",
-    "@discord-player/youtube": "^1.x"
+    "@discord-player/youtube": "^1.x", 
     "@discordjs/voice": "^0.16.1",
     "discord-player": "^6.6.6",
     "discord.js": "^14.14.1",
