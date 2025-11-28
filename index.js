@@ -14,16 +14,18 @@ try {
 }
 // ----------------------------------
 
-// --- 2. SETUP CLIENT & PLAYER ---
-const client = new Client({
-    intents: [
-        IntentsBitField.Flags.Guilds,
-        IntentsBitField.Flags.GuildMessages,
-        IntentsBitField.Flags.GuildVoiceStates,
-        IntentsBitField.Flags.MessageContent,
-    ],
+// Setup Player (Discord-Player)
+const player = new Player(client, {
+    ytdlOptions: {
+        quality: 'highestaudio',
+        filter: 'audioonly',
+        highWaterMark: 1 << 25,
+        dlChunkSize: 0,
+    },
 });
 
+// BARIS TAMBAHAN: Tempelkan objek player ke client
+client.player = player;
 // Collection untuk menyimpan commands
 client.commands = new Collection();
 
