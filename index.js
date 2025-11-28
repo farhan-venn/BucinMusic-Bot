@@ -1,9 +1,18 @@
+// index.js (Gunakan import untuk semuanya)
 import { Client, IntentsBitField } from 'discord.js';
 import 'dotenv/config';
 
-// GUNAKAN REQUIRE untuk paket CommonJS (untuk menghindari Syntax Error)
-const { Player } = require('discord-player');
-const { ExtractorFactory } = require('@discord-player/extractor');
+// --- PERBAIKAN IMPORT COMMONJS ---
+// Node.js memaksa file ini menjadi ES Module, jadi kita harus mengimpor paket CommonJS
+// (seperti discord-player dan extractor) melalui default import.
+
+import discordPlayerPkg from 'discord-player';
+const { Player } = discordPlayerPkg;
+
+import extractorPkg from '@discord-player/extractor';
+const { ExtractorFactory } = extractorPkg;
+// ---------------------------------
+
 
 const client = new Client({
     intents: [
@@ -40,7 +49,7 @@ player.events.on('playerError', (queue, error) => {
     console.log(`[Player Track Error] ${error.message}`);
 });
 
-// Import commands (Ubah menjadi require jika isinya CommonJS)
-require('./commands.js'); 
+// Import commands (Pastikan commands.js Anda adalah file ES Module yang valid)
+import('./commands.js'); 
 
 client.login(process.env.TOKEN);
