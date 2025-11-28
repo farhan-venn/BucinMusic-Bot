@@ -4,6 +4,15 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
+// 1. VERIFIKASI PAKET DISCORDJS/VOICE
+try {
+    require('@discordjs/voice');
+} catch (e) {
+    console.error("FATAL ERROR: Paket '@discordjs/voice' tidak ditemukan. Pastikan sudah diinstal di package.json!");
+    process.exit(1); // Hentikan bot jika paket penting hilang
+}
+
+
 // Setup Client
 const client = new Client({
     intents: [
@@ -37,39 +46,54 @@ async function loadExtractors() {
     }
 }
 
-// --- COMMAND HANDLER (Membaca Folder 'commands') ---
+// --- COMMAND HANDLER (Membaca Folder 'commands' secara Rekursif) ---
 const commandsPath = path.join(__dirname, 'commands');
-// Membaca file di dalam folder commands (asumsi tidak ada sub-folder kategori)
-// Jika Anda punya sub-folder (misal: commands/music/play.js), kabari saya.
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-
 const commandsToRegister = [];
 
-for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    const command = require(filePath);
+function readCommands(dir) {
+    const files = fs.readdirSync(dir);
 
-    // Pastikan file command punya properti 'data' dan 'execute'
-    if ('data' in command && 'execute' in command) {
-        client.commands.set(command.data.name, command);
-        commandsToRegister.push(command.data.toJSON());
-        console.log(`[Info] Command dimuat: ${command.data.name}`);
-    } else {
-        console.log(`[Warning] Command di ${filePath} tidak punya properti 'data' atau 'execute'.`);
+    for (const file of files) {
+        const filePath = path.join(dir, file);
+        const stat = fs.statSync(filePath);
+
+        if (stat.isDirectory()) {
+            readCommands(filePath); // Masuk ke sub-folder
+        } else if (file.endsWith('.js')) {
+            try {
+                // Gunakan require(filePath) untuk memastikan path absolut
+                const command = require(filePath); 
+
+                // Pastikan file command punya properti 'data' dan 'execute'
+                if ('data' in command && 'execute' in command) {
+                    client.commands.set(command.data.name, command);
+                    commandsToRegister.push(command.data.toJSON());
+                    console.log(`[Info] Command dimuat: ${command.data.name}`);
+                } else {
+                    console.log(`[Warning] Command di ${filePath} tidak punya properti 'data' atau 'execute'.`);
+                }
+            } catch (e) {
+                console.error(`[ERROR] Gagal memuat command di ${filePath}: ${e.message}`);
+            }
+        }
     }
 }
-// ---------------------------------------------------
+try {
+    readCommands(commandsPath);
+} catch (e) {
+    console.error(`[FATAL] Gagal membaca folder commands: ${e.message}`);
+}
+// -------------------------------------------------------------------
 
 client.on('ready', async () => {
     console.log(`BucinMusic#${client.user ? client.user.username : 'Bot'} online!`);
-    await loadExtractors();
+    await loadExtractors(); // Muat extractor setelah bot online
 
     // Mendaftarkan Slash Commands ke Discord API
     const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
     try {
         console.log(`Sedang mendaftarkan ${commandsToRegister.length} commands...`);
         
-        // Pastikan Anda menambahkan CLIENT_ID di Variable Railway
         const clientId = process.env.CLIENT_ID || client.user.id; 
         
         await rest.put(
