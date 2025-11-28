@@ -43,10 +43,13 @@ client.player = player;
 // Fungsi Memuat Extractors
 async function loadExtractors() {
     try {
+        // Menggunakan ExtractorFactory yang diimpor langsung
         await ExtractorFactory.loadPlayerExtractors(player);
         console.log('[Bot] Extractors loaded successfully!');
     } catch (e) {
+        // Logika tambahan untuk debugging:
         console.error('[Bot] Failed to load extractors:', e);
+        console.log('Pastikan @discord-player/extractor sudah terinstal.');
     }
 }
 // ----------------------------------
