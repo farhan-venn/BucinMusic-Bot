@@ -1,11 +1,10 @@
 const { Client, IntentsBitField, Collection, REST, Routes } = require('discord.js');
 const { Player } = require('discord-player');
-// Import ExtractorFactory yang dibutuhkan, menggunakan require
+// Pastikan baris ini ada dan benar
 const { ExtractorFactory } = require('@discord-player/extractor'); 
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
-
 // --- 1. VERIFIKASI PAKET PENTING ---
 try {
     require('@discordjs/voice');
@@ -38,10 +37,10 @@ const player = new Player(client, {
     },
 });
 
-// Fungsi Memuat Extractors (menggunakan ExtractorFactory yang sudah di-require)
+// Fungsi Memuat Extractors
 async function loadExtractors() {
     try {
-        // PERBAIKAN: Memuat Extractor menggunakan ExtractorFactory yang sudah di-require di awal file
+        // Baris ini sekarang seharusnya bekerja karena ExtractorFactory sudah di-require di atas
         await ExtractorFactory.loadPlayerExtractors(player);
         console.log('[Bot] Extractors loaded successfully!');
     } catch (e) {
