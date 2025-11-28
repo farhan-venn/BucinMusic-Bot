@@ -1,83 +1,45 @@
-require("dotenv").config();
-const { Client, GatewayIntentBits, Collection } = require("discord.js");
-const { Player } = require("discord-player");
-const { DefaultExtractors } = require("@discord-player/extractor");
-const fs = require("fs");
-const express = require("express");
+// index.js (Pastikan kode Anda sudah dimodifikasi seperti ini)
+import { Client, IntentsBitField } from 'discord.js';
+import 'dotenv/config';
+import { Player, ExtractorFactory } from 'discord-player'; // Tambahkan ExtractorFactory
 
 const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildVoiceStates
-  ]
+    intents: [
+        IntentsBitField.Flags.Guilds,
+        IntentsBitField.Flags.GuildMessages,
+        IntentsBitField.Flags.GuildVoiceStates,
+        IntentsBitField.Flags.MessageContent,
+    ],
 });
 
-async function initializePlayer() {
-  try {
-    client.player = new Player(client, {
-      connectionTimeout: 120000,
-      lagMonitor: 60000,
-      skipFFmpeg: false,
-      ytdlOptions: {
-        quality: "lowestaudio",
+client.on('ready', () => {
+    console.log(`BucinMusic#${client.user.discriminator} online!`);
+});
+
+const player = new Player(client, {
+    ytdlOptions: {
+        quality: 'highestaudio',
+        filter: 'audioonly',
         highWaterMark: 1 << 25,
-        requestOptions: {
-          headers: {
-            'User-Agent': 'Mozilla/5.0'
-          }
-        }
-      }
-    });
-
-    await client.player.extractors.loadMulti(DefaultExtractors);
-    console.log('[Bot] Player initialized with extractors');
-
-    // Handle player errors
-    client.player.on('error', (error, queue) => {
-      console.error('[Player Global Error]:', error);
-    });
-
-    client.player.on('playerError', (error, queue) => {
-      console.error('[Player Error]:', error);
-    });
-
-    client.player.on('playerStart', (queue, track) => {
-      console.log(`[Player] Started playing: ${track.title}`);
-      queue.metadata?.send(`🎵 Now playing: **${track.title}**`).catch(() => {});
-    });
-
-    client.player.on('playerFinish', (queue) => {
-      console.log('[Player] Track finished');
-    });
-
-  } catch (err) {
-    console.error('[Bot] Failed to initialize player:', err.message);
-  }
-}
-
-client.on('ready', async () => {
-  if (!client.player) await initializePlayer();
-  console.log(`${client.user.tag} online!`);
+        dlChunkSize: 0,
+    },
 });
 
-client.commands = new Collection();
-const commandFiles = fs.readdirSync("./commands").filter(f => f.endsWith(".js"));
-for (const file of commandFiles) {
-  const cmd = require(`./commands/${file}`);
-  client.commands.set(cmd.data.name, cmd);
-}
+// WAJIB DITAMBAHKAN/VERIFIKASI: Memuat semua extractor yang terinstal
+player.extractors.loadDefault();
+console.log('[Bot] Player initialized with extractors');
 
-const eventFiles = fs.readdirSync("./events").filter(f => f.endsWith(".js"));
-for (const file of eventFiles) {
-  const event = require(`./events/${file}`);
-  if (event.once) client.once(event.name, (...args) => event.execute(...args, client));
-  else client.on(event.name, (...args) => event.execute(...args, client));
-}
+// Tangani event error (disarankan)
+player.on('error', (queue, error) => {
+    console.log(`[Player Error] ${error.message}`);
+});
 
-const app = express();
-app.get("/", (req, res) => res.send("Bot is running"));
-app.listen(3000, () => console.log("Keep-alive server running"));
+// Tangani event track error (disarankan)
+player.events.on('playerError', (queue, error) => {
+    console.log(`[Player Track Error] ${error.message}`);
+});
+
+// Import commands (asumsi file ini mengimpor semua commands)
+import('./commands.js'); // Ganti dengan cara Anda memuat commands
 
 client.login(process.env.TOKEN);
