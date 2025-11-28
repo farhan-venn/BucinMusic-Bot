@@ -11,8 +11,14 @@ module.exports = {
         .setRequired(true)
     ),
 
-  // Pastikan player diterima di sini!
-  async execute({ interaction, player }) {
+  // Kita hanya perlu menerima 'interaction' dan 'client'
+async execute({ interaction, client }) {
+    // Ambil player dari client yang baru saja kita tempelkan
+    const player = client.player; 
+
+    // Jika bot gagal menempelkan player (error parah)
+    if (!player) return interaction.reply("❌ Error internal: Player object tidak ditemukan.");
+
     const query = interaction.options.getString("query");
     const voiceChannel = interaction.member.voice.channel;
 
@@ -23,7 +29,7 @@ module.exports = {
 
     try {
       // Menggunakan objek 'player' secara langsung
-      const { track } = await player.play(voiceChannel, query, {
+      const { track } = await player.play(voiceChannel, query, { 
         requestedBy: interaction.user,
         nodeOptions: {
           metadata: { channel: interaction.channel },
@@ -38,7 +44,7 @@ module.exports = {
       }
 
       return interaction.editReply(`🎶 Memutar: **${track.title}**`);
-
+      
     } catch (e) {
       console.error('[Play Error]', e.message);
       return interaction.editReply(`❌ Error saat memutar lagu: ${e.message}`);
