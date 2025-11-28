@@ -1,12 +1,12 @@
-// index.js 
+// index.js (Solusi Stabil ESM/CommonJS)
 import { Client, IntentsBitField } from 'discord.js';
 import 'dotenv/config';
 
-// Import kedua paket CommonJS sebagai objek default (pkg)
+// 1. Impor paket CommonJS sebagai objek default (pkg)
 import discordPlayerPkg from 'discord-player';
 import extractorPkg from '@discord-player/extractor';
 
-// Ekstrak Player dan ExtractorFactory dari objek default tersebut
+// 2. Ekstrak kelas yang dibutuhkan dari objek default yang sudah diimpor
 const { Player } = discordPlayerPkg;
 const { ExtractorFactory } = extractorPkg; 
 // ----------------------------------------
@@ -22,7 +22,7 @@ const client = new Client({
 });
 
 client.on('ready', () => {
-    // Kita menggunakan client.user.username 
+    // Menggunakan username karena discriminator deprecated
     console.log(`BucinMusic#${client.user.username} online!`);
 });
 
@@ -35,7 +35,7 @@ const player = new Player(client, {
     },
 });
 
-// Baris ini akan bekerja karena ExtractorFactory seharusnya sudah terdefinisi
+// Baris ini sekarang seharusnya berhasil karena ExtractorFactory sudah terdefinisi
 ExtractorFactory.load(player);
 console.log('[Bot] Player initialized with extractors');
 
@@ -48,7 +48,7 @@ player.events.on('playerError', (queue, error) => {
     console.log(`[Player Track Error] ${error.message}`);
 });
 
-// Import commands (Kita kembali ke import jika file lain menggunakan import)
+// Gunakan import untuk commands (sesuai dengan mode ESM)
 import('./commands.js'); 
 
 client.login(process.env.TOKEN);
