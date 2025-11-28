@@ -39,12 +39,15 @@ const player = new Player(client, {
 // Fungsi Memuat Extractors
 async function loadExtractors() {
     try {
-        await player.extractors.loadDefault();
+        const { ExtractorFactory } = require('@discord-player/extractor');
+        // Muat Extractor yang stabil dan resmi
+        await ExtractorFactory.loadPlayerExtractors(player);
         console.log('[Bot] Extractors loaded successfully!');
     } catch (e) {
         console.error('[Bot] Failed to load extractors:', e);
     }
 }
+
 
 // --- COMMAND HANDLER (Membaca Folder 'commands' secara Rekursif) ---
 const commandsPath = path.join(__dirname, 'commands');
