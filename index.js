@@ -4,7 +4,6 @@ const { Player } = require('discord-player');
 const { ExtractorFactory } = require('@discord-player/extractor');
 const fs = require('fs');
 const path = require('path');
-const playdl = require('play-dl'); // <-- TAMBAHKAN INI
 require('dotenv').config();
 
 // --- 1. VERIFIKASI PAKET PENTING ---
