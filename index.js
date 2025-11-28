@@ -1,8 +1,11 @@
+// index.js (Gunakan require untuk paket-paket CommonJS)
+// Kita tetap bisa menggunakan import untuk modul dasar JS
 import { Client, IntentsBitField } from 'discord.js';
 import 'dotenv/config';
-import { Player } from 'discord-player'; // Import Player dari discord-player
-// Karena kita menambahkan "type": "module", kita bisa import ExtractorFactory
-import { ExtractorFactory } from '@discord-player/extractor'; 
+
+// GUNAKAN REQUIRE UNTUK PAKET EXTERNAL DISCORD-PLAYER
+const { Player } = require('discord-player');
+const { ExtractorFactory } = require('@discord-player/extractor');
 
 const client = new Client({
     intents: [
@@ -26,12 +29,11 @@ const player = new Player(client, {
     },
 });
 
-// WAJIB: Memuat Extractor Factory untuk mengatasi "No current track"
-// Ini adalah cara yang benar untuk memuat extractor di lingkungan ES Module.
+// Memuat Extractor Factory
 ExtractorFactory.load(player);
 console.log('[Bot] Player initialized with extractors');
 
-// Tangani event error (disarankan)
+// Tangani event error
 player.on('error', (queue, error) => {
     console.log(`[Player Error] ${error.message}`);
 });
@@ -40,7 +42,7 @@ player.events.on('playerError', (queue, error) => {
     console.log(`[Player Track Error] ${error.message}`);
 });
 
-// Import commands (sesuaikan dengan cara Anda memuat commands)
-import('./commands.js'); 
+// Import commands (ini mungkin perlu require juga jika isinya CommonJS)
+require('./commands.js'); // Ganti import menjadi require
 
 client.login(process.env.TOKEN);
