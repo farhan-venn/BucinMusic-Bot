@@ -1,22 +1,22 @@
-# Gunakan image dasar Node.js
-FROM node:20-slim 
+# Gunakan image Node.js LTS 18 yang stabil
+FROM node:18-alpine 
 
-# Instal FFMPEG dan dependensi build (nasm)
-USER root
-RUN apt-get update && apt-get install -y \
-    ffmpeg \
-    nasm \
-    && rm -rf /var/lib/apt/lists/*
-
-# Persiapan Lingkungan Aplikasi
+# Set direktori kerja di dalam container
 WORKDIR /usr/src/app
 
-# Salin dan instal dependensi Node.js
+# Salin package.json dan package-lock.json (jika ada) ke dalam container
 COPY package*.json ./
-RUN npm install --production
+
+# Instal semua dependensi
+# --force diperlukan untuk mengatasi beberapa isu dependency graph lama
+RUN npm install --omit=dev --force
 
 # Salin sisa kode aplikasi
 COPY . .
 
-# Tentukan perintah untuk menjalankan bot
-CMD [ "node", "index.js" ]
+# Beri hak akses eksekusi ke start.sh (jika Anda membuatnya di langkah sebelumnya)
+# Jika tidak, hapus baris ini, tapi jika Anda membuat start.sh, biarkan
+RUN chmod +x start.sh 
+
+# Tentukan command untuk menjalankan bot (sesuai skrip start di package.json)
+CMD ["npm", "start"]
