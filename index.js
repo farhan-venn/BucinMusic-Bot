@@ -1,7 +1,7 @@
 const { Client, IntentsBitField, Collection, REST, Routes } = require('discord.js');
 const { Player } = require('discord-player');
-// Pastikan baris ini ada dan benar
-const { ExtractorFactory } = require('@discord-player/extractor'); 
+const ExtractorPackage = require('@discord-player/extractor'); 
+const ExtractorFactory = ExtractorPackage.ExtractorFactory || ExtractorPackage.default.ExtractorFactory; // <-- Perbaikan Utama
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
@@ -37,11 +37,9 @@ const player = new Player(client, {
     },
 });
 
-// Fungsi Memuat Extractors
 async function loadExtractors() {
     try {
-        // Baris ini sekarang seharusnya bekerja karena ExtractorFactory sudah di-require di atas
-        await ExtractorFactory.loadPlayerExtractors(player);
+        await ExtractorFactory.loadPlayerExtractors(player); // <-- Tetap menggunakan ini
         console.log('[Bot] Extractors loaded successfully!');
     } catch (e) {
         console.error('[Bot] Failed to load extractors:', e);
