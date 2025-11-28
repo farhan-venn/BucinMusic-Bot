@@ -1,14 +1,14 @@
-// index.js (Solusi Campuran Import/Require Paling Stabil)
+// index.js 
 import { Client, IntentsBitField } from 'discord.js';
 import 'dotenv/config';
 
-// 1. Impor createRequire dari modul bawaan Node.js
-import { createRequire } from 'module'; 
-const require = createRequire(import.meta.url); // 2. Buat fungsi require()
+// Import kedua paket CommonJS sebagai objek default (pkg)
+import discordPlayerPkg from 'discord-player';
+import extractorPkg from '@discord-player/extractor';
 
-// 3. GUNAKAN REQUIRE YANG BARU DIBUAT untuk paket-paket CommonJS
-const { Player } = require('discord-player');
-const { ExtractorFactory } = require('@discord-player/extractor');
+// Ekstrak Player dan ExtractorFactory dari objek default tersebut
+const { Player } = discordPlayerPkg;
+const { ExtractorFactory } = extractorPkg; 
 // ----------------------------------------
 
 
@@ -22,7 +22,7 @@ const client = new Client({
 });
 
 client.on('ready', () => {
-    // Kita menggunakan client.user.username karena discriminator dihapus di Discord.js v14
+    // Kita menggunakan client.user.username 
     console.log(`BucinMusic#${client.user.username} online!`);
 });
 
@@ -35,11 +35,11 @@ const player = new Player(client, {
     },
 });
 
-// Memuat Extractor Factory (Baris ini yang menyebabkan error)
+// Baris ini akan bekerja karena ExtractorFactory seharusnya sudah terdefinisi
 ExtractorFactory.load(player);
 console.log('[Bot] Player initialized with extractors');
 
-// Tangani event error
+// Tangani event error 
 player.on('error', (queue, error) => {
     console.log(`[Player Error] ${error.message}`);
 });
@@ -48,7 +48,7 @@ player.events.on('playerError', (queue, error) => {
     console.log(`[Player Track Error] ${error.message}`);
 });
 
-// Gunakan require() untuk commands (sesuai dengan fungsi require yang kita buat)
-require('./commands.js'); 
+// Import commands (Kita kembali ke import jika file lain menggunakan import)
+import('./commands.js'); 
 
 client.login(process.env.TOKEN);
