@@ -1,9 +1,7 @@
-// index.js (Gunakan require untuk paket-paket CommonJS)
-// Kita tetap bisa menggunakan import untuk modul dasar JS
 import { Client, IntentsBitField } from 'discord.js';
 import 'dotenv/config';
 
-// GUNAKAN REQUIRE UNTUK PAKET EXTERNAL DISCORD-PLAYER
+// GUNAKAN REQUIRE untuk paket CommonJS (untuk menghindari Syntax Error)
 const { Player } = require('discord-player');
 const { ExtractorFactory } = require('@discord-player/extractor');
 
@@ -33,7 +31,7 @@ const player = new Player(client, {
 ExtractorFactory.load(player);
 console.log('[Bot] Player initialized with extractors');
 
-// Tangani event error
+// Tangani event error (disarankan)
 player.on('error', (queue, error) => {
     console.log(`[Player Error] ${error.message}`);
 });
@@ -42,7 +40,7 @@ player.events.on('playerError', (queue, error) => {
     console.log(`[Player Track Error] ${error.message}`);
 });
 
-// Import commands (ini mungkin perlu require juga jika isinya CommonJS)
-require('./commands.js'); // Ganti import menjadi require
+// Import commands (Ubah menjadi require jika isinya CommonJS)
+require('./commands.js'); 
 
 client.login(process.env.TOKEN);
