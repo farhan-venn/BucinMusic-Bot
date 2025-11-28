@@ -1,3 +1,5 @@
+// File: commands/play.js
+
 const { SlashCommandBuilder } = require("discord.js");
 
 module.exports = {
@@ -11,14 +13,16 @@ module.exports = {
         .setRequired(true)
     ),
 
-  // Kita hanya perlu menerima 'interaction' dan 'client'
-async execute({ interaction, client }) {
-    // Ambil player dari client yang baru saja kita tempelkan
+  // PERBAIKAN 1: HANYA ambil 'interaction' dan 'client' dari index.js
+  async execute({ interaction, client }) {
+    // PERBAIKAN 2: Ambil player dari client yang sudah ditempelkan
     const player = client.player; 
 
-    // Jika bot gagal menempelkan player (error parah)
-    if (!player) return interaction.reply("❌ Error internal: Player object tidak ditemukan.");
-
+    // Cek keamanan jika player tetap undefined (meski seharusnya tidak)
+    if (!player) {
+      return interaction.reply("❌ Error: Player internal bot gagal diinisialisasi.");
+    }
+    
     const query = interaction.options.getString("query");
     const voiceChannel = interaction.member.voice.channel;
 
@@ -28,7 +32,7 @@ async execute({ interaction, client }) {
     await interaction.deferReply();
 
     try {
-      // Menggunakan objek 'player' secara langsung
+      // Baris ini (sekitar baris 19-32 di file Anda) akan berhasil
       const { track } = await player.play(voiceChannel, query, { 
         requestedBy: interaction.user,
         nodeOptions: {
