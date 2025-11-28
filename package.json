@@ -2,8 +2,7 @@
   "name": "bucinmusic-bot",
   "version": "1.0.0",
   "description": "Bot Musik untuk Bucin",
-  "main": "index.js",
-  "type": "module",  
+  "main": "index.js"
   "scripts": {
     "start": "node index.js"
   },
