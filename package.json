@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Bot Musik untuk Bucin",
   "main": "index.js",
+  "type": "module",  
   "scripts": {
     "start": "node index.js"
   },
@@ -13,11 +14,11 @@
   "author": "Farhan Venn",
   "license": "ISC",
   "dependencies": {
-    "@discord-player/extractor": "^4.4.7", 
+    "@discord-player/extractor": "^4.4.7",
     "discord-player": "^6.6.6",
     "discord.js": "^14.14.1",
     "dotenv": "^16.3.1",
-    "ffmpeg-static": "^5.2.0", 
+    "ffmpeg-static": "^5.2.0",
     "ytdl-core": "^4.11.5"
   }
 }
