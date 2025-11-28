@@ -13,12 +13,12 @@ module.exports = {
         .setRequired(true)
     ),
 
-  // PERBAIKAN 1: HANYA ambil 'interaction' dan 'client' dari index.js
+  // Ambil hanya 'interaction' dan 'client'
   async execute({ interaction, client }) {
-    // PERBAIKAN 2: Ambil player dari client yang sudah ditempelkan
+    // Ambil player dari client yang sudah ditempelkan
     const player = client.player; 
 
-    // Cek keamanan jika player tetap undefined (meski seharusnya tidak)
+    // Cek keamanan
     if (!player) {
       return interaction.reply("❌ Error: Player internal bot gagal diinisialisasi.");
     }
@@ -32,7 +32,7 @@ module.exports = {
     await interaction.deferReply();
 
     try {
-      // Baris ini (sekitar baris 19-32 di file Anda) akan berhasil
+      // Panggilan player.play() yang sudah benar
       const { track } = await player.play(voiceChannel, query, { 
         requestedBy: interaction.user,
         nodeOptions: {
