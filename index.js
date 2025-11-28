@@ -1,19 +1,21 @@
 const { Client, IntentsBitField, Collection, REST, Routes } = require('discord.js');
 const { Player } = require('discord-player');
+// Import ExtractorFactory yang dibutuhkan, menggunakan require
+const { ExtractorFactory } = require('@discord-player/extractor'); 
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-// 1. VERIFIKASI PAKET DISCORDJS/VOICE
+// --- 1. VERIFIKASI PAKET PENTING ---
 try {
     require('@discordjs/voice');
 } catch (e) {
     console.error("FATAL ERROR: Paket '@discordjs/voice' tidak ditemukan. Pastikan sudah diinstal di package.json!");
-    process.exit(1); // Hentikan bot jika paket penting hilang
+    process.exit(1);
 }
+// ----------------------------------
 
-
-// Setup Client
+// --- 2. SETUP CLIENT & PLAYER ---
 const client = new Client({
     intents: [
         IntentsBitField.Flags.Guilds,
@@ -36,20 +38,20 @@ const player = new Player(client, {
     },
 });
 
-// Fungsi Memuat Extractors
+// Fungsi Memuat Extractors (menggunakan ExtractorFactory yang sudah di-require)
 async function loadExtractors() {
     try {
-        const { ExtractorFactory } = require('@discord-player/extractor');
-        // Muat Extractor yang stabil dan resmi
+        // PERBAIKAN: Memuat Extractor menggunakan ExtractorFactory yang sudah di-require di awal file
         await ExtractorFactory.loadPlayerExtractors(player);
         console.log('[Bot] Extractors loaded successfully!');
     } catch (e) {
         console.error('[Bot] Failed to load extractors:', e);
     }
 }
+// ----------------------------------
 
 
-// --- COMMAND HANDLER (Membaca Folder 'commands' secara Rekursif) ---
+// --- 3. COMMAND HANDLER (Membaca Folder 'commands' secara Rekursif) ---
 const commandsPath = path.join(__dirname, 'commands');
 const commandsToRegister = [];
 
@@ -61,13 +63,11 @@ function readCommands(dir) {
         const stat = fs.statSync(filePath);
 
         if (stat.isDirectory()) {
-            readCommands(filePath); // Masuk ke sub-folder
+            readCommands(filePath); 
         } else if (file.endsWith('.js')) {
             try {
-                // Gunakan require(filePath) untuk memastikan path absolut
                 const command = require(filePath); 
 
-                // Pastikan file command punya properti 'data' dan 'execute'
                 if ('data' in command && 'execute' in command) {
                     client.commands.set(command.data.name, command);
                     commandsToRegister.push(command.data.toJSON());
@@ -88,6 +88,8 @@ try {
 }
 // -------------------------------------------------------------------
 
+
+// --- 4. EVENT HANDLERS ---
 client.on('ready', async () => {
     console.log(`BucinMusic#${client.user ? client.user.username : 'Bot'} online!`);
     await loadExtractors(); // Muat extractor setelah bot online
@@ -146,4 +148,5 @@ player.events.on('playerError', (queue, error) => {
     console.log(`[Player Track Error] ${error.message}`);
 });
 
+// --- 5. START BOT ---
 client.login(process.env.TOKEN);
