@@ -120,7 +120,7 @@ client.on('interactionCreate', async (interaction) => {
     }
 
     try {
-        // Oper 'player' ke dalam execute agar bisa dipakai di file command
+        // PERBAIKAN: Pastikan objek 'player' diteruskan dengan benar ke execute
         await command.execute({ interaction, client, player });
     } catch (error) {
         console.error(error);
