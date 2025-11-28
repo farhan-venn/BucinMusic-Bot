@@ -2,7 +2,6 @@
 FROM node:20-slim 
 
 # Instal FFMPEG dan dependensi build (nasm)
-# Ini adalah solusi untuk masalah 'Could not load ffmpeg'
 USER root
 RUN apt-get update && apt-get install -y \
     ffmpeg \
