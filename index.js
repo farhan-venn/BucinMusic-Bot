@@ -1,11 +1,10 @@
-// index.js (Perbaikan Modul Final)
-import { Client, IntentsBitField } from 'discord.js';
-import 'dotenv/config';
+const { Client, IntentsBitField } = require('discord.js');
+require('dotenv').config();
 
-// Import langsung Player dan ExtractorFactory (mode ESM)
-import { Player } from 'discord-player'; 
-import { ExtractorFactory } from '@discord-player/extractor';
-
+// Gunakan require untuk discord-player
+const { Player } = require('discord-player');
+// Kita tidak perlu ExtractorFactory secara eksplisit jika menggunakan loadDefault
+const { BridgeProvider, Type } = require('@discord-player/extractor');
 
 const client = new Client({
     intents: [
@@ -17,7 +16,7 @@ const client = new Client({
 });
 
 client.on('ready', () => {
-    console.log(`BucinMusic#${client.user.username} online!`);
+    console.log(`BucinMusic#${client.user ? client.user.username : 'Bot'} online!`);
 });
 
 const player = new Player(client, {
@@ -29,8 +28,19 @@ const player = new Player(client, {
     },
 });
 
-ExtractorFactory.load(player);
-console.log('[Bot] Player initialized with extractors');
+// FUNGSI UTAMA UNTUK MEMUAT EXTRACTOR (CommonJS Style)
+// Kita bungkus dalam fungsi async agar aman
+async function loadExtractors() {
+    try {
+        await player.extractors.loadDefault();
+        console.log('[Bot] Player initialized with default extractors!');
+    } catch (e) {
+        console.error('[Bot] Failed to load extractors:', e);
+    }
+}
+
+// Panggil fungsi load
+loadExtractors();
 
 player.on('error', (queue, error) => {
     console.log(`[Player Error] ${error.message}`);
@@ -40,6 +50,12 @@ player.events.on('playerError', (queue, error) => {
     console.log(`[Player Track Error] ${error.message}`);
 });
 
-import('./commands.js'); 
+// Import commands menggunakan require
+// PERHATIAN: Pastikan file commands.js Anda menggunakan 'module.exports'
+try {
+    require('./commands.js');
+} catch (e) {
+    console.log('[Warning] commands.js mungkin bermasalah atau tidak ditemukan:', e.message);
+}
 
 client.login(process.env.TOKEN);
