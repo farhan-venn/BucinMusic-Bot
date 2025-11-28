@@ -4,6 +4,7 @@ const { Player } = require('discord-player');
 const { ExtractorFactory } = require('@discord-player/extractor');
 const fs = require('fs');
 const path = require('path');
+const playdl = require('play-dl'); // <-- TAMBAHKAN INI
 require('dotenv').config();
 
 // --- 1. VERIFIKASI PAKET PENTING ---
@@ -30,10 +31,10 @@ client.commands = new Collection();
 const player = new Player(client, {
     ytdlOptions: {
         quality: 'highestaudio',
-        filter: 'audioonly',
         highWaterMark: 1 << 25,
-        dlChunkSize: 0,
     },
+    // PERBAIKAN: SETELAH client (atau sebelum ytdlOptions)
+    extractor: playdl.ytdl // <-- TAMBAHKAN INI
 });
 
 // BARIS KRUSIAL: Tempelkan objek player ke client
