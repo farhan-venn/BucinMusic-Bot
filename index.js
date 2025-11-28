@@ -1,17 +1,15 @@
-// index.js (Gunakan import untuk semuanya)
+// index.js (Solusi Campuran Import/Require Paling Stabil)
 import { Client, IntentsBitField } from 'discord.js';
 import 'dotenv/config';
 
-// --- PERBAIKAN IMPORT COMMONJS ---
-// Node.js memaksa file ini menjadi ES Module, jadi kita harus mengimpor paket CommonJS
-// (seperti discord-player dan extractor) melalui default import.
+// 1. Impor createRequire dari modul bawaan Node.js
+import { createRequire } from 'module'; 
+const require = createRequire(import.meta.url); // 2. Buat fungsi require()
 
-import discordPlayerPkg from 'discord-player';
-const { Player } = discordPlayerPkg;
-
-import extractorPkg from '@discord-player/extractor';
-const { ExtractorFactory } = extractorPkg;
-// ---------------------------------
+// 3. GUNAKAN REQUIRE YANG BARU DIBUAT untuk paket-paket CommonJS
+const { Player } = require('discord-player');
+const { ExtractorFactory } = require('@discord-player/extractor');
+// ----------------------------------------
 
 
 const client = new Client({
@@ -24,7 +22,8 @@ const client = new Client({
 });
 
 client.on('ready', () => {
-    console.log(`BucinMusic#${client.user.discriminator} online!`);
+    // Kita menggunakan client.user.username karena discriminator dihapus di Discord.js v14
+    console.log(`BucinMusic#${client.user.username} online!`);
 });
 
 const player = new Player(client, {
@@ -36,11 +35,11 @@ const player = new Player(client, {
     },
 });
 
-// Memuat Extractor Factory
+// Memuat Extractor Factory (Baris ini yang menyebabkan error)
 ExtractorFactory.load(player);
 console.log('[Bot] Player initialized with extractors');
 
-// Tangani event error (disarankan)
+// Tangani event error
 player.on('error', (queue, error) => {
     console.log(`[Player Error] ${error.message}`);
 });
@@ -49,7 +48,7 @@ player.events.on('playerError', (queue, error) => {
     console.log(`[Player Track Error] ${error.message}`);
 });
 
-// Import commands (Pastikan commands.js Anda adalah file ES Module yang valid)
-import('./commands.js'); 
+// Gunakan require() untuk commands (sesuai dengan fungsi require yang kita buat)
+require('./commands.js'); 
 
 client.login(process.env.TOKEN);
