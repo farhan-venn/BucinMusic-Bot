@@ -125,8 +125,10 @@ client.on('interactionCreate', async (interaction) => {
     }
 
     try {
-        // Panggil hanya { interaction, client }
-        await command.execute({ interaction, client });
+        // KEMBALIKAN player ke dalam destructuring ARGUMEN, 
+        // meskipun kita tahu client.player sudah ditempelkan.
+        // Ini memastikan tidak ada error variabel yang hilang.
+        await command.execute({ interaction, client, player });
     } catch (error) {
         console.error(error);
         if (interaction.replied || interaction.deferred) {
