@@ -1,6 +1,6 @@
 const { Client, IntentsBitField, Collection, REST, Routes } = require('discord.js');
 const { Player } = require('discord-player');
-// Hapus semua require Extractor di sini!
+// HAPUS SEMUA require Extractor di sini!
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
@@ -8,8 +8,9 @@ require('dotenv').config();
 // --- 1. VERIFIKASI PAKET PENTING ---
 try {
     require('@discordjs/voice');
+    require('play-dl'); // PENTING: Verifikasi play-dl di sini
 } catch (e) {
-    console.error("FATAL ERROR: Paket '@discordjs/voice' tidak ditemukan. Pastikan sudah diinstal di package.json!");
+    console.error(`FATAL ERROR: Paket wajib tidak ditemukan. Pastikan '@discordjs/voice' dan 'play-dl' terinstal. Detail: ${e.message}`);
     process.exit(1);
 }
 // ----------------------------------
@@ -27,7 +28,7 @@ client.commands = new Collection();
 
 // --- 3. DEKLARASI PLAYER ---
 const player = new Player(client, {
-    // Player akan menggunakan Extractor bawaan secara otomatis di v6.x
+    // Player akan menggunakan play-dl secara otomatis jika sudah terinstal
 });
 
 // BARIS KRUSIAL: Tempelkan objek player ke client
@@ -35,7 +36,6 @@ client.player = player;
 // ------------------------------------------
 
 // HAPUS FUNGSI loadExtractors() KARENA SUDAH TIDAK PERLU DIPANGGIL SECARA MANUAL
-// ----------------------------------
 
 
 // --- 4. COMMAND HANDLER (Membaca Folder 'commands' secara Rekursif) ---
@@ -79,7 +79,7 @@ try {
 // --- 5. EVENT HANDLERS ---
 client.on('ready', async () => {
     console.log(`BucinMusic#${client.user ? client.user.username : 'Bot'} online!`);
-    // HAPUS PANGGILAN INI: await loadExtractors(); 
+    // TIDAK PERLU MEMANGGIL loadExtractors() 
 
     // Mendaftarkan Slash Commands ke Discord API
     const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
@@ -110,8 +110,7 @@ client.on('interactionCreate', async (interaction) => {
     }
 
     try {
-        // Panggil hanya { interaction, client }
-        // play.js akan mendapatkan player melalui client.player
+        // HANYA TERUSKAN interaction dan client
         await command.execute({ interaction, client }); 
     } catch (error) {
         console.error(error);
@@ -125,15 +124,17 @@ client.on('interactionCreate', async (interaction) => {
 
 // Error Handling Player
 player.events.on('playerStart', (queue, track) => {
-    queue.metadata.channel.send(`🎶 Mulai memutar **${track.title}**!`);
+    if (queue.metadata && queue.metadata.channel) {
+        queue.metadata.channel.send(`🎶 Mulai memutar **${track.title}**!`);
+    }
 });
 
-player.on('error', (queue, error) => {
-    console.log(`[Player Error] ${error.message}`);
+player.events.on('error', (queue, error) => {
+    console.error(`[Player Error] ${error.message}`);
 });
 
 player.events.on('playerError', (queue, error) => {
-    console.log(`[Player Track Error] ${error.message}`);
+    console.error(`[Player Track Error] ${error.message}`);
 });
 
 // --- 6. START BOT ---
