@@ -1,21 +1,21 @@
 const { Client, IntentsBitField, Collection, REST, Routes } = require('discord.js');
 const { Player } = require('discord-player');
-// HAPUS SEMUA require Extractor di sini!
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
 // --- 1. VERIFIKASI PAKET PENTING ---
+// Memastikan play-dl dan @discordjs/voice terinstal
 try {
     require('@discordjs/voice');
-    require('play-dl'); // PENTING: Verifikasi play-dl di sini
+    require('play-dl'); 
 } catch (e) {
     console.error(`FATAL ERROR: Paket wajib tidak ditemukan. Pastikan '@discordjs/voice' dan 'play-dl' terinstal. Detail: ${e.message}`);
     process.exit(1);
 }
 // ----------------------------------
 
-// --- 2. DEKLARASI CLIENT (HARUS PERTAMA) ---
+// --- 2. DEKLARASI CLIENT ---
 const client = new Client({
     intents: [
         IntentsBitField.Flags.Guilds,
@@ -27,18 +27,17 @@ const client = new Client({
 client.commands = new Collection(); 
 
 // --- 3. DEKLARASI PLAYER ---
+// Player akan otomatis menggunakan play-dl jika sudah terinstal di package.json
 const player = new Player(client, {
-    // Player akan menggunakan play-dl secara otomatis jika sudah terinstal
+    ytdlOptions: {
+        quality: 'highestaudio',
+        highWaterMark: 1 << 25,
+    }
 });
-
-// BARIS KRUSIAL: Tempelkan objek player ke client
 client.player = player; 
 // ------------------------------------------
 
-// HAPUS FUNGSI loadExtractors() KARENA SUDAH TIDAK PERLU DIPANGGIL SECARA MANUAL
-
-
-// --- 4. COMMAND HANDLER (Membaca Folder 'commands' secara Rekursif) ---
+// --- 4. COMMAND HANDLER ---
 const commandsPath = path.join(__dirname, 'commands');
 const commandsToRegister = [];
 
@@ -75,11 +74,9 @@ try {
 }
 // -------------------------------------------------------------------
 
-
 // --- 5. EVENT HANDLERS ---
 client.on('ready', async () => {
     console.log(`BucinMusic#${client.user ? client.user.username : 'Bot'} online!`);
-    // TIDAK PERLU MEMANGGIL loadExtractors() 
 
     // Mendaftarkan Slash Commands ke Discord API
     const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
@@ -110,7 +107,6 @@ client.on('interactionCreate', async (interaction) => {
     }
 
     try {
-        // HANYA TERUSKAN interaction dan client
         await command.execute({ interaction, client }); 
     } catch (error) {
         console.error(error);
