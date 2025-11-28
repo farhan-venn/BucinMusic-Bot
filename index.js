@@ -1,10 +1,11 @@
 const { Client, IntentsBitField, Collection, REST, Routes } = require('discord.js');
 const { Player } = require('discord-player');
 const ExtractorPackage = require('@discord-player/extractor'); 
-const ExtractorFactory = ExtractorPackage.ExtractorFactory || ExtractorPackage.default.ExtractorFactory; // <-- Perbaikan Utama
+const ExtractorFactory = ExtractorPackage.ExtractorFactory || ExtractorPackage.default.ExtractorFactory;
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
+
 // --- 1. VERIFIKASI PAKET PENTING ---
 try {
     require('@discordjs/voice');
@@ -14,7 +15,18 @@ try {
 }
 // ----------------------------------
 
-// Setup Player (Discord-Player)
+// --- 2. DEKLARASI CLIENT (HARUS PERTAMA) ---
+const client = new Client({
+    intents: [
+        IntentsBitField.Flags.Guilds,
+        IntentsBitField.Flags.GuildMessages,
+        IntentsBitField.Flags.GuildVoiceStates,
+        IntentsBitField.Flags.MessageContent,
+    ],
+});
+client.commands = new Collection(); // Inisialisasi Collection di sini.
+
+// --- 3. DEKLARASI PLAYER (HANYA SATU KALI) ---
 const player = new Player(client, {
     ytdlOptions: {
         quality: 'highestaudio',
@@ -24,24 +36,14 @@ const player = new Player(client, {
     },
 });
 
-// BARIS TAMBAHAN: Tempelkan objek player ke client
-client.player = player;
-// Collection untuk menyimpan commands
-client.commands = new Collection();
+// BARIS PENTING: Tempelkan objek player ke client SETELAH KEDUANYA dideklarasikan
+client.player = player; 
+// ------------------------------------------
 
-// Setup Player (Discord-Player)
-const player = new Player(client, {
-    ytdlOptions: {
-        quality: 'highestaudio',
-        filter: 'audioonly',
-        highWaterMark: 1 << 25,
-        dlChunkSize: 0,
-    },
-});
-
+// Fungsi Memuat Extractors
 async function loadExtractors() {
     try {
-        await ExtractorFactory.loadPlayerExtractors(player); // <-- Tetap menggunakan ini
+        await ExtractorFactory.loadPlayerExtractors(player);
         console.log('[Bot] Extractors loaded successfully!');
     } catch (e) {
         console.error('[Bot] Failed to load extractors:', e);
@@ -50,7 +52,7 @@ async function loadExtractors() {
 // ----------------------------------
 
 
-// --- 3. COMMAND HANDLER (Membaca Folder 'commands' secara Rekursif) ---
+// --- 4. COMMAND HANDLER (Membaca Folder 'commands' secara Rekursif) ---
 const commandsPath = path.join(__dirname, 'commands');
 const commandsToRegister = [];
 
@@ -88,7 +90,7 @@ try {
 // -------------------------------------------------------------------
 
 
-// --- 4. EVENT HANDLERS ---
+// --- 5. EVENT HANDLERS ---
 client.on('ready', async () => {
     console.log(`BucinMusic#${client.user ? client.user.username : 'Bot'} online!`);
     await loadExtractors(); // Muat extractor setelah bot online
@@ -122,8 +124,8 @@ client.on('interactionCreate', async (interaction) => {
     }
 
     try {
-        // PERBAIKAN: Pastikan objek 'player' diteruskan dengan benar ke execute
-        await command.execute({ interaction, client, player });
+        // Karena player ditempelkan ke client, panggil hanya { interaction, client }
+        await command.execute({ interaction, client });
     } catch (error) {
         console.error(error);
         if (interaction.replied || interaction.deferred) {
@@ -147,5 +149,5 @@ player.events.on('playerError', (queue, error) => {
     console.log(`[Player Track Error] ${error.message}`);
 });
 
-// --- 5. START BOT ---
+// --- 6. START BOT ---
 client.login(process.env.TOKEN);
