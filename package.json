@@ -4,7 +4,7 @@
   "description": "Discord Music Bot",
   "main": "index.js",
   "scripts": {
-    "start": "bash start.sh"
+    "start": "sh start.sh"
   },
   "dependencies": {
     "discord.js": "^14.14.1",
