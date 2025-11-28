@@ -1,3 +1,5 @@
+// play.js (Perbaikan)
+
 const { SlashCommandBuilder } = require("discord.js");
 
 module.exports = {
@@ -10,8 +12,9 @@ module.exports = {
         .setDescription("Judul lagu atau URL")
         .setRequired(true)
     ),
-
-  async execute(interaction, client) {
+  
+  // Ambil objek 'player' langsung dari argumen yang diteruskan index.js
+  async execute({ interaction, player }) { 
     const query = interaction.options.getString("query");
     const voiceChannel = interaction.member.voice.channel;
 
@@ -23,32 +26,30 @@ module.exports = {
     try {
       console.log(`[Play] Query: ${query}`);
       
-      const queue = await client.player.play(voiceChannel, query, {
+      // Menggunakan objek 'player' secara langsung
+      const { track } = await player.play(voiceChannel, query, { 
         requestedBy: interaction.user,
         nodeOptions: {
-          metadata: interaction.channel,
+          metadata: { channel: interaction.channel }, // Metadata harus berupa objek
           leaveOnEmpty: true,
           leaveOnEnd: true,
           leaveOnStop: true
         }
       });
 
-      console.log(`[Play] Queue created, waiting for track...`);
+      console.log(`[Play] Now playing: ${track.title}`);
       
-      // Wait a bit for track to load
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      if (!queue?.currentTrack) {
-        console.log('[Play] No current track after wait');
+      // Cek apakah track berhasil dimuat
+      if (!track) {
         return interaction.editReply(`❌ Gagal memuat lagu. Coba lagi.`);
       }
 
-      console.log(`[Play] Now playing: ${queue.currentTrack.title}`);
-      return interaction.editReply(`🎶 Memutar: **${queue.currentTrack.title}**`);
+      return interaction.editReply(`🎶 Memutar: **${track.title}**`);
       
     } catch (e) {
       console.error('[Play Error]', e.message);
-      return interaction.editReply(`❌ Error: ${e.message}`);
+      // Jika terjadi error (misalnya tidak ada hasil), kirim pesan ini:
+      return interaction.editReply(`❌ Error saat memutar lagu: ${e.message}`);
     }
   }
 };
