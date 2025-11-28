@@ -1,8 +1,7 @@
 const { Client, IntentsBitField, Collection, REST, Routes } = require('discord.js');
 const { Player } = require('discord-player');
 // Pastikan paket extractor di-require dengan benar
-const ExtractorPackage = require('@discord-player/extractor'); 
-const ExtractorFactory = ExtractorPackage.ExtractorFactory || ExtractorPackage.default.ExtractorFactory;
+const { ExtractorFactory } = require('@discord-player/extractor');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
