@@ -1,4 +1,4 @@
-// railway.json yang benar
+
 {
   "build": {
     "packages": ["ffmpeg", "nasm"] 
